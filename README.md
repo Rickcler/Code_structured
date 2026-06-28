@@ -13,7 +13,7 @@ Im zweiten Skript werden all die verwendeten Funktionen definiert. Sie sind eing
   - Plot
 Da hier sowieso noch nichts simuliert wird, am besten alles durchlaufen lassen.
 
-### 02_run_sim.r
+### 02_run_sim
 Hier werden noch eine Preprocessing Schritte gemacht und die verschiedenen Simulationen. Die verschiedenen Szenarien oben können wohl am besten alle mal geladen werden. 
 
 Danach lohnt es sich nur die relevanten Simulationen zu laden.
@@ -30,3 +30,11 @@ Danach lohnt es sich nur die relevanten Simulationen zu laden.
 - Kappa $H_A$ Simulationen für die beiden Plots bezüglich $\kappa(h)$ unter $H_A$:
   - `kappa_HA_df` / `kappa_summary` / `ci_df` für den linken Plot (Konfidenzintervalle)
   - `rej_list` / `rej_df` für den rechten Plot (Rejectionrates)
+
+### 03_run_asymp
+Erstellt asymptotisch berechnete Objekte ensprechend dem paper
+  - `asymp_df` für all die "Comparison-Plots"
+  - `Sigma_raw` für die Bias Plots
+
+### 04_visuals
+Hier ist der Code für die Plots mit einigen weiteren preprocessing Schritten. Die plots sind weitestegehend entsprechend der Ordnung im Paper angeordnet. Bloß die Comparison-Plots (Figures 4.6- 4.9) ist erst nach Szenarios, dann nach Reihenfolge der Plots im Paper sortiert, wobei das Szenario mit serieller Abhängigkeit von $O_t$ im selben Block unten separat behandelt wird.
