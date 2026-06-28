@@ -8,9 +8,13 @@ source("00_setup.R")
 load("Masterarbeit.RData")
 
 
+#------------------------------------------------------------------------------
+# Figure 4.1: Data Example
+#------------------------------------------------------------------------------
+
 
 #------------------------------------------------------------------------------
-# Figure 4.1: Cohen's Kappa of BinAR(1) for different values of r
+# Figure 4.2: Cohen's Kappa of BinAR(1) for different values of r
 #------------------------------------------------------------------------------
 
 m <- 10         # Anzahl der Versuche (Zustandsraum {0,...,m})
@@ -52,7 +56,7 @@ print(Cohens_Plot)
 ggsave("Graphs/Cohens_Kappa_by_h.png", Cohens_Plot, width = 8, height = 6)
 
 #------------------------------------------------------------------------------
-# Figure 4.2: Maginal Distribution 
+# Figure 4.3: Maginal Distribution 
 #------------------------------------------------------------------------------
 
 # Masterarbeit
@@ -122,7 +126,7 @@ MarginalsPlot <- p_pmf / p_cdf_dist +
 print(MarginalsPlot)
 ggsave("Graphs/MarginalsPlot.png", MarginalsPlot, width = 8, height = 8)
 #------------------------------------------------------------------------------
-# Figures 4.3 and 4.4: Bias and CLT 
+# Figures 4.4 and 4.5: Bias and CLT 
 #------------------------------------------------------------------------------
 theory_df_2 <- data.frame(
   n    = seq(2, 1000, by = 1),
@@ -247,7 +251,7 @@ print(scaled_bias_plot)
 ggsave("Graphs/Bias_scaled.png", scaled_bias_plot + theme(legend.position = "none"), width = 8, height = 5)
 
 # ------------------------------------------------------------------------------
-# Figures 4.5 - 4.8: Comparisonplots IOV, Skew, Cohen's K 
+# Figures 4.6 - 4.9: Comparisonplots IOV, Skew, Cohen's K 
 # ------------------------------------------------------------------------------
 
 
@@ -479,7 +483,7 @@ ggsave(
 )
 
 
-# Plot-Block B (Figure 4.6): IOV with serial dependence in Missingness, pi == 0.75
+# Plot-Block B (Figure 4.7): IOV with serial dependence in Missingness, pi == 0.75
 
 
 ### Scenario A
@@ -565,7 +569,7 @@ ggsave(
   height = 1
 )
 # ==============================================================================
-# Figure 4.9: Rejection rates under H_0 for uncorrected vs. bias-corrected test statistic
+# Figure 4.10: Rejection rates under H_0 for uncorrected vs. bias-corrected test statistic
 # ==============================================================================
 
 ggplot(rej_H0_df,
@@ -626,7 +630,7 @@ ggplot(rej_H0_df,
 ggsave("Graphs/rejection_H0_level.png", width = 10, height = 5)
 
 # ------------------------------------------------------------------------------
-# Figure 4.10: Consistency of Cohen's κ under H_A 
+# Figure 4.11: Consistency of Cohen's κ under H_A 
 # ------------------------------------------------------------------------------
 
 ### Left Plot (with Confidence Ribbons)
@@ -786,7 +790,7 @@ ggsave("Graphs/kappa_rejection_rate.png", width = 5.5, height = 8)
 
 
 # ------------------------------------------------------------------------------
-# Figure 4.11: IOV under MNAR 
+# Figure 4.12: IOV under MNAR 
 # ------------------------------------------------------------------------------
 
 # MCAR: direkt aus sim_df (m=3, p=0.20, r=0.35, pi=0.75, pi_h=0)
@@ -891,7 +895,7 @@ ggsave(
   height = 5
 )
 # ------------------------------------------------------------------------------
-# Figure 4.12: Serial dependence under MNAR 
+# Figure 4.13: Serial dependence under MNAR 
 # ------------------------------------------------------------------------------
 
 # Left Plot - Confidence Intervalls 
