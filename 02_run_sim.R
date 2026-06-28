@@ -104,7 +104,7 @@ results_MAR_inv <- apply(scenarios_MAR, 1, function(row) {
   )
 })
 
-# Figure 4.12 left plot
+# Figure 4.13 left plot
 set.seed(42)
 
 kappa_inc_list <- lapply(n_grid, function(n) {
@@ -127,7 +127,7 @@ kappa_dec_list <- lapply(n_grid, function(n) {
   data.frame(n = n, kappa_hat = vals, mech = "Decreasing")
 })
 
-# Figure 4.12 right plot
+# Figure 4.13 right plot
 set.seed(42)
 rej_list_mnar <- lapply(1:nrow(scenarios_mnar), function(s) {
 
