@@ -671,6 +671,69 @@ simulation_kappa_HA_MNAR <- function(
 # Plot Functions
 # ------------------------------------------------------------------------------
 
+#' Bereitet subset + x-Positionen für Vergleichs-Plots vor
+#' @param data       combined_df
+#' @param filter_fn  Eine dplyr-filter-Bedingung als Funktion
+#' @param group_var  Variable für x-Gruppierung (Symbol, z.B. quote(pi))
+prepare_comparison_subset <- function(data, filter_expr, group_var_name) {
+  subset <- data %>% filter({{ filter_expr }})
+
+  unique_groups <- unique(subset[, c("n", group_var_name, "type")])
+  unique_groups <- unique_groups[order(
+    unique_groups$n,
+    unique_groups[[group_var_name]],
+    factor(unique_groups$type, levels = c("Simulation", "Asymptotic"))
+  ), ]
+
+  key <- paste(unique_groups$n, unique_groups[[group_var_name]],
+               unique_groups$type, sep = "_")
+  x_positions        <- setNames(seq_len(nrow(unique_groups)), key)
+  subset$x_pos       <- x_positions[paste(subset$n, subset[[group_var_name]],
+                                           subset$type, sep = "_")]
+  subset$x_pos       <- as.numeric(subset$x_pos)
+
+  group_labels <- unique(subset[, c("n", group_var_name)])
+  group_labels <- group_labels[order(group_labels$n,
+                                     group_labels[[group_var_name]]), ]
+
+  group_centers <- sapply(seq_len(nrow(group_labels)), function(i) {
+    mean(subset$x_pos[
+      subset$n == group_labels$n[i] &
+      subset[[group_var_name]] == group_labels[[group_var_name]][i]
+    ])
+  })
+
+  x_labels <- mapply(
+  function(n_val, g_val) {
+
+    if (group_var_name == "pi") {
+      bquote(atop(n == .(n_val),
+                   pi == .(g_val)))
+
+    } else if (group_var_name == "r_pi") {
+      bquote(atop(n == .(n_val),
+                   r[pi] == .(g_val)))
+
+    } else if (group_var_name == "pi_h") {
+      bquote(atop(n == .(n_val),
+                   pi[h] == .(g_val)))
+
+    } else {
+      bquote(atop(n == .(n_val),
+                   .(group_var_name) == .(g_val)))
+    }
+
+  },
+  group_labels$n,
+  group_labels[[group_var_name]],
+  SIMPLIFY = FALSE
+)
+
+  list(subset = subset, group_centers = group_centers, x_labels = x_labels)
+}
+
+
+                 
 #' Generischer Vergleichs-Plot (IOV, Skew oder Cohen's K)
 #' @param subset        Vorbereitetes subset mit x_pos
 #' @param y_var         String: Spaltenname der y-Variable (z.B. "mean_IOV")
