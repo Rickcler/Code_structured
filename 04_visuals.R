@@ -6,12 +6,35 @@
 
 source("00_setup.R")
 load("Masterarbeit.RData")
-
+save.image("Masterarbeit.RData")
 
 #------------------------------------------------------------------------------
 # Figure 4.1: Data Example
 #------------------------------------------------------------------------------
 
+df_plot <- sleep1[[1]] %>%
+  mutate(
+    # Gruppe bricht bei NA auf – jede zusammenhängende Sequenz ohne NA
+    # bekommt eine eigene Gruppen-ID
+    gruppe = cumsum(is.na(state) | c(FALSE, is.na(head(state, -1))))
+  ) %>%
+  filter(!is.na(state))
+
+sleep_plot <- ggplot(df_plot, aes(x = min, y = state, group = gruppe)) +
+  geom_line(linewidth = 0.4, color = "steelblue") +
+  geom_point(size = 5, color = "steelblue") +
+  scale_y_continuous(
+    breaks = 1:6,
+    labels = c("Deep", "Light 2", "Light 1", "REM", "Wake", "Movement")
+  ) +
+  labs(
+    x       = "Time (minutes)",
+    y       = "Sleep state",
+    caption = "Lines are interrupted at missing observations (minutes 116–120)."
+  ) +
+  theme_minimal()
+print(sleep_plot)
+ggsave("Graphs/sleep_example.png", sleep_plot, width = 8, height = 4)
 
 #------------------------------------------------------------------------------
 # Figure 4.2: Cohen's Kappa of BinAR(1) for different values of r
@@ -156,7 +179,7 @@ for (i in 1:10) {
 SD_Iov <- sqrt((16 / 10^2) * Var_Iov)
 
 
-# Figure 4.3 left: CLT-Dichte unscaled
+# Figure 4.4 left: CLT-Dichte unscaled
 unscaled_CLT_plot <- ggplot(sim_data, aes(x = diff, fill = factor(n))) +
   geom_density(alpha = 0.4) +
   labs(x = expression(Bias(IOV))) +
@@ -166,7 +189,7 @@ print(unscaled_CLT_plot)
 ggsave("Graphs/CLT_unscaled.png", unscaled_CLT_plot + theme(legend.position = "none"), width = 8, height = 5)
 
 
-# Figure 4.3 right: CLT-Dichte scaled
+# Figure 4.4 right: CLT-Dichte scaled
 scaled_CLT_plot <- ggplot(sim_data, aes(x = scaled_CLT, fill = factor(n))) +
   geom_density(alpha = 0.4) +
   stat_function(
@@ -182,7 +205,7 @@ print(scaled_CLT_plot)
 ggsave("Graphs/CLT_scaled.png", scaled_CLT_plot + theme(legend.position = "none"), width = 8, height = 5)
 
 
-# Figure 4.4 left: Mittlerer Bias unscaled
+# Figure 4.5 left: Mittlerer Bias unscaled
 unscaled_bias_plot <- ggplot(mean_df_2, aes(x = n, y = mean_diff)) +
   geom_line(data = theory_df_2, aes(x = n, y = diff),
             color = "steelblue", linetype = "dashed", linewidth = 0.8) +
@@ -200,8 +223,9 @@ print(unscaled_bias_plot)
 ggsave("Graphs/Bias_unscaled.png", unscaled_bias_plot + theme(legend.position = "none"), width = 8, height = 5)
 
 
-# Figure 4.4 right: Mittlerer Bias scaled
-
+# Figure 4.5 right: Mittlerer Bias scaled
+f_true <- pbinom(0:(m-1), 10, 0.3)
+IOV_true <- (4 / 10) * sum(f_true * (1 - f_true))
 band_df_2 <- sim_data_2 %>%
   group_by(n) %>%
   summarise(
@@ -212,7 +236,7 @@ band_df_2 <- sim_data_2 %>%
   ) %>%
   ungroup()
 
-IOV_true <- (4 / 10) * sum(f_true * (1 - f_true))
+
 scaled_bias_plot <- ggplot(band_df_2, aes(x = n, y = mean_scaled_diff)) +
   
   # 95%-Konfidenzintervall des Monte-Carlo-Mittelwerts (vertikale Linien)
@@ -267,7 +291,7 @@ combined_df <- combined_df %>%
   )
 
 
-# Plot-Block A (Figure 4.5, 4.7, 4.8): Comparisonplots for pi in {1, 0.75} and r_pi == 0 (MCAR)
+# Plot-Block A (Figure 4.6, 4.8, 4.9): Comparisonplots for pi in {1, 0.75} and r_pi == 0 (MCAR)
 
 ### Scenario A
 
@@ -289,7 +313,7 @@ sub_A1$IOV_upper_centered <- sub_A1$upper_IOV - t_IOV_A1
 
 
 
-# IOV (Figure 4.5)
+# IOV (Figure 4.6)
 IOV_plot <- comparison_plot(
   sub_A1, "IOV_centered", "IOV_lower_centered", "IOV_upper_centered",
   true_val      = 0,
@@ -305,7 +329,7 @@ IOV_plot <- comparison_plot(
 print(IOV_plot)
 ggsave(sprintf("Graphs/iov_m%d.png", m_A1), IOV_plot + theme(legend.position = "none"), width = 8, height = 5)
 
-# Skew (Figure 4.7)
+# Skew (Figure 4.8)
 Skew_plot <- comparison_plot(
   sub_A1, "mean_Skew", "lower_Skew", "upper_Skew",
   true_val      = t_Skew_A1,
@@ -321,7 +345,7 @@ Skew_plot <- comparison_plot(
 print(Skew_plot)
 ggsave(sprintf("Graphs/skew_m%d.png", m_A1), Skew_plot + theme(legend.position = "none"), width = 8, height = 5)
 
-# Cohen's κ (Figure 4.8)
+# Cohen's κ (Figure 4.9)
 Cohens_plot <- comparison_plot(
   sub_A1, "mean_C", "lower_C", "upper_C",
   true_val      = 0,
@@ -356,7 +380,7 @@ sub_B1$IOV_centered <- sub_B1$mean_IOV - t_IOV_B1
 sub_B1$IOV_lower_centered <- sub_B1$lower_IOV - t_IOV_B1
 sub_B1$IOV_upper_centered <- sub_B1$upper_IOV - t_IOV_B1
 
-# IOV (Figure 4.5)
+# IOV (Figure 4.6)
 IOV_plot <- comparison_plot(
   sub_B1, "IOV_centered", "IOV_lower_centered", "IOV_upper_centered",
   true_val      = 0,
@@ -372,7 +396,7 @@ IOV_plot <- comparison_plot(
 print(IOV_plot)
 ggsave(sprintf("Graphs/iov_m%d.png", m_B1), IOV_plot + theme(legend.position = "none"), width = 8, height = 5)
 
-# Skew (Figure 4.7)
+# Skew (Figure 4.8)
 Skew_plot <- comparison_plot(
   sub_B1, "mean_Skew", "lower_Skew", "upper_Skew",
   true_val      = t_Skew_B1,
@@ -388,7 +412,7 @@ Skew_plot <- comparison_plot(
 print(Skew_plot)
 ggsave(sprintf("Graphs/skew_m%d.png", m_B1), Skew_plot + theme(legend.position = "none"), width = 8, height = 5)
 
-# Cohen's κ (Figure 4.8)
+# Cohen's κ (Figure 4.9)
 Cohens_plot <- comparison_plot(
   sub_B1, "mean_C", "lower_C", "upper_C",
   true_val      = 0,
@@ -404,7 +428,7 @@ Cohens_plot <- comparison_plot(
 print(Cohens_plot)
 ggsave(sprintf("Graphs/kappa_m%d.png", m_B1), Cohens_plot + theme(legend.position = "none"), width = 8, height = 5)
 
-# Legende (Figures 4.5, 4.7, 4.8)
+# Legende (Figures 4.6, 4.8, 4.9)
 p <- Skew_plot
 legend <- get_legend(
   p + theme(legend.position = "bottom")
@@ -440,7 +464,7 @@ sub_A2$IOV_lower_centered <- sub_A2$lower_IOV - t_IOV_A2
 sub_A2$IOV_upper_centered <- sub_A2$upper_IOV - t_IOV_A2
 
 
-# IOV (Figure 4.6)
+# IOV (Figure 4.7)
 IOV_sd_plot <- comparison_plot(
   sub_A2, "IOV_centered", "IOV_lower_centered", "IOV_upper_centered",
   true_val      = 0,
@@ -473,7 +497,7 @@ sub_B2$IOV_centered <- sub_B2$mean_IOV - t_IOV_B2
 sub_B2$IOV_lower_centered <- sub_B2$lower_IOV - t_IOV_B2
 sub_B2$IOV_upper_centered <- sub_B2$upper_IOV - t_IOV_B2
 
-# IOV (Figure 4.6)
+# IOV (Figure 4.7)
 IOV_sd_plot <- comparison_plot(
   sub_B2, "IOV_centered", "IOV_lower_centered", "IOV_upper_centered",
   true_val      = 0,

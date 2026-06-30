@@ -12,6 +12,7 @@ library(ggplot2)
 library(patchwork)
 library(cowplot)
 library(scales)
+library(astsa)
 
 
 # Globale Simulationsparameter
